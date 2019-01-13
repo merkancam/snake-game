@@ -24,20 +24,21 @@ document.addEventListener("keydown", function (key) {
                 direction = "Left";
             break;
         case 39:
-        if (direction != "Left")
-            direction = "Right";
+            if (direction != "Left")
+                direction = "Right";
+            break;
+        case 32:
+            direction = "Pause;"
             break;
         default:
             break;
     }
-    console.log(direction);
-
 });
 
 
 setInterval(() => {
     snakeController.moveSnakePosition(direction);
-}, 100);
+}, 85);
 
 
 

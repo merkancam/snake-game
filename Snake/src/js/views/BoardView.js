@@ -5,6 +5,8 @@ import {
 
 export const rows = 30;
 export const cols = 30;
+export let foodLocation = {};
+export let boardLocations = [];
 
 export const createBoard = () => {
     let tableRows = '';
@@ -12,6 +14,7 @@ export const createBoard = () => {
         tableRows += '<tr>'
         for (let c = 0; c <= cols; c++) {
             tableRows += `<td id="${c}.${r}"></td>`;
+            boardLocations.push({ x: c, y: r, isAvailable : true });
         }
         tableRows += '</tr>';
     }
