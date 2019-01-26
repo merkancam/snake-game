@@ -1,10 +1,14 @@
 import * as base from '../views/Base'
-import * as board from '../views/BoardView';
+import * as board from '../controllers/BoardController';
 
 export let snakePositions = [];
+let positionHeadOfSnake;
+export let positionNext = { x: -1, y: -1 };
+
+
 export const resetSnakePosition = (boardCols, boardRows) => {
     snakePositions = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
         let c = (boardCols / 2) + i;
         let r = (boardRows / 2);
         snakePositions.push({
@@ -18,14 +22,15 @@ export const resetSnakePosition = (boardCols, boardRows) => {
 
         found.isAvailable = false;
     }
-
-    putNewFood();
+    positionHeadOfSnake = snakePositions[snakePositions.length - 1];
+    board.putNewFood();
 }
 
 
-export const moveSnakePosition = (direction) => {
-    let positionHeadOfSnake = snakePositions[snakePositions.length - 1];
-    let positionNext = { x: -1, y: -1 }
+
+export const setNewPosition = (direction) => {
+    positionHeadOfSnake = snakePositions[snakePositions.length - 1];
+    positionNext = { x: -1, y: -1 }
     let haveMatched = true;
 
     switch (direction) {
@@ -53,26 +58,25 @@ export const moveSnakePosition = (direction) => {
             break;
     }
 
+    keepSnakeInsideBoard(positionNext);
+    return haveMatched;
+}
 
-    if (haveMatched) {
-        snakePositions.push(positionNext);
-        var found = board.boardLocations.find(function (element) {
-            return element.x == positionNext.x && element.y == positionNext.y;
-        });
-        found.isAvailable = false;
-        fillCell(positionNext);
+export const moveSnake = () => {
 
-        if (isFoodExists(positionNext)) {
-            putNewFood();
-        }
-        else {
-            let removedItem = snakePositions.shift();
-            var found = board.boardLocations.find(function (element) {
-                return element.x == removedItem.x && element.y == removedItem.y;
-            });
-            found.isAvailable = true;
-            clearCell(removedItem);
-        }
+    snakePositions.push(positionNext);
+    var found = board.findLocation(positionNext);
+    found.isAvailable = false;
+    board.fillCell(positionNext);
+    if (board.isFoodExists(positionNext)) {
+        board.increaseScore();
+        board.putNewFood();
+    }
+    else {
+        let removedItem = snakePositions.shift();
+        var found = board.findLocation(removedItem);
+        found.isAvailable = true;
+        board.clearCell(removedItem);
     }
 
 };
@@ -80,39 +84,31 @@ export const moveSnakePosition = (direction) => {
 export const showSnake = () => {
     snakePositions.forEach(function (e) {
         let column = `${e.x}.${e.y}`;
-        document.getElementById(column).style.backgroundColor = "black";
+        document.getElementById(column).style.backgroundColor = "white";
     });
 }
 
 
-const fillCell = (cellPosition) => {
-    let filledCell = `${cellPosition.x}.${cellPosition.y}`;
-    document.getElementById(filledCell).style.backgroundColor = "black";
-}
 
-
-const clearCell = (cellPosition) => {
-    let clearedCell = `${cellPosition.x}.${cellPosition.y}`;
-    document.getElementById(clearedCell).style.backgroundColor = "white";
-}
-
-const putNewFood = () => {
-    let availablePoints = board.boardLocations.filter(x => x.isAvailable == true);
-    let lengthOfArray = availablePoints.length;
-    const rnd = Math.floor(Math.random() * lengthOfArray);
-    board.foodLocation.x = availablePoints[rnd].x;
-    board.foodLocation.y = availablePoints[rnd].y;
-    let foodCell = `${board.foodLocation.x}.${board.foodLocation.y}`;
-    document.getElementById(foodCell).style.backgroundColor = "green";
-}
-
-
-
-
-const isFoodExists = (location) => {
-    if (board.foodLocation.x == location.x && board.foodLocation.y == location.y) {
-        return true;
+const keepSnakeInsideBoard = (positionNext) => {
+    if (positionNext.y > board.rows) {
+        positionNext.y = 0;
     }
-    return false;
+
+    if (positionNext.y < 0) {
+        positionNext.y = board.rows;
+    }
+
+    if (positionNext.x > board.cols) {
+        positionNext.x = 0;
+    }
+
+    if (positionNext.x < 0) {
+        positionNext.x = board.cols;
+    }
 }
+
+
+
+
 
