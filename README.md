@@ -1,5 +1,5 @@
 
-This is a simple snake game
+This is a snake game written in Javascript 
 
-Open [https://merkancam.github.io/play-snake/](https://merkancam.github.io/play-snake/) to play!
+Click [here](https://merkancam.github.io/play-snake/) to play!
 
